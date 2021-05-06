@@ -72,12 +72,15 @@ module Net
           @auth_methods.each do |name|
             begin
               next unless @allowed_auth_methods.include?(name)
+
               attempted << name
 
               debug { "trying #{name}" }
               begin
                 auth_class = Methods.const_get(name.split(/\W+/).map { |p| p.capitalize }.join)
-                method = auth_class.new(self, key_manager: key_manager, password_prompt: options[:password_prompt])
+                method = auth_class.new(self,
+                                        key_manager: key_manager, password_prompt: options[:password_prompt],
+                                        pubkey_algorithms: options[:pubkey_algorithms] || nil)
               rescue NameError
                 debug {"Mechanism #{name} was requested, but isn't a known type.  Ignoring it."}
                 next
